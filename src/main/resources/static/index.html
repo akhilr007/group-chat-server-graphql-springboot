@@ -22,7 +22,7 @@
 
     // Connect button click handler
     document.getElementById("connect").addEventListener("click", function () {
-        socket = new SockJS('http://localhost:8080/chat'); // Replace with your server's base URL
+        socket = new SockJS('http://localhost:8080/chat');
         stompClient = Stomp.over(socket);
 
         stompClient.connect({}, function (frame) {
@@ -54,7 +54,7 @@
     // Send button click handler
     document.getElementById("send").addEventListener("click", function () {
         var message = document.getElementById("message").value;
-        stompClient.send("/app/hello", {}, message); // Adjust destination if needed
+        stompClient.send("/app/hello", {}, message);
         document.getElementById("message").value = "";
     });
 
