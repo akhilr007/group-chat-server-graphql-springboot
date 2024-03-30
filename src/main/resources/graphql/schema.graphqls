@@ -1,0 +1,22 @@
+type Message {
+    id: ID!,
+    content: String!,
+    sender: String!,
+}
+
+type Query {
+    messages: [Message]
+}
+
+type Mutation {
+    createMessage(message: MessageInput): Message!
+}
+
+type Subscription {
+    newMessage: Message
+}
+
+input MessageInput {
+    content: String,
+    sender: String
+}

@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>WebSocket Client</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.5.2/sockjs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+</head>
+<body>
+<h1>WebSocket Client</h1>
+
+<button id="connect">Connect</button>
+<button id="disconnect" disabled>Disconnect</button>
+<br>
+<textarea id="message" rows="5" cols="50" placeholder="Enter your message"></textarea>
+<button id="send" disabled>Send</button>
+<br>
+<div id="messages"></div>
+
+<script>
+    var socket;
+    var stompClient;
+
+    // Connect button click handler
+    document.getElementById("connect").addEventListener("click", function () {
+        socket = new SockJS('http://localhost:8080/chat'); // Replace with your server's base URL
+        stompClient = Stomp.over(socket);
+
+        stompClient.connect({}, function (frame) {
+            console.log('Connected: ' + frame);
+            document.getElementById("connect").disabled = true;
+            document.getElementById("disconnect").disabled = false;
+            document.getElementById("send").disabled = false;
+
+            // Subscribe to a destination to receive messages
+            stompClient.subscribe('/topic/newMessage', function (message) {
+                console.log('Received message: ' + message.body);
+                var messageDiv = document.getElementById("messages");
+                messageDiv.innerHTML += message.body + "<br>";
+            });
+        });
+    });
+
+    // Disconnect button click handler
+    document.getElementById("disconnect").addEventListener("click", function () {
+        stompClient.disconnect(function () {
+            console.log('Disconnected');
+            document.getElementById("connect").disabled = false;
+            document.getElementById("disconnect").disabled = true;
+            document.getElementById("send").disabled = true;
+            document.getElementById("messages").innerHTML = "";
+        });
+    });
+
+    // Send button click handler
+    document.getElementById("send").addEventListener("click", function () {
+        var message = document.getElementById("message").value;
+        stompClient.send("/app/hello", {}, message); // Adjust destination if needed
+        document.getElementById("message").value = "";
+    });
+
+    // Handle errors and close event (optional)
+    if (stompClient) {
+        stompClient.onclose = function () {
+            console.log('WebSocket connection closed');
+        };
+    }
+</script>
+</body>
+</html>
